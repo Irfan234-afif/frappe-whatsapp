@@ -1,0 +1,103 @@
+{
+    "actions": [],
+    "allow_rename": 1,
+    "autoname": "field:session_name",
+    "creation": "2026-01-18 00:00:00",
+    "doctype": "DocType",
+    "editable_grid": 1,
+    "engine": "InnoDB",
+    "field_order": [
+        "session_name",
+        "status",
+        "column_break_1",
+        "is_default_outgoing",
+        "section_break_qr",
+        "qr_scan_button",
+        "qr_code_image",
+        "response"
+    ],
+    "fields": [
+        {
+            "fieldname": "session_name",
+            "fieldtype": "Data",
+            "in_list_view": 1,
+            "label": "Session Name",
+            "reqd": 1,
+            "unique": 1
+        },
+        {
+            "fieldname": "status",
+            "fieldtype": "Select",
+            "in_list_view": 1,
+            "label": "Status",
+            "options": "Ready to Scan QR\nConnected\nDisconnected\nFailed\nStarting...\nUnknown",
+            "read_only": 1
+        },
+        {
+            "fieldname": "column_break_1",
+            "fieldtype": "Column Break"
+        },
+        {
+            "fieldname": "is_default_outgoing",
+            "fieldtype": "Check",
+            "label": "Default Outgoing",
+            "description": "Mark this session as the default sender for outgoing WhatsApp messages"
+        },
+        {
+            "fieldname": "section_break_qr",
+            "fieldtype": "Section Break",
+            "label": "QR Code"
+        },
+        {
+            "fieldname": "qr_scan_button",
+            "fieldtype": "Button",
+            "label": "Scan QR"
+        },
+        {
+            "fieldname": "response",
+            "fieldtype": "Code",
+            "label": "Last Response",
+            "options": "JSON",
+            "read_only": 1,
+            "hidden": 1
+        },
+        {
+            "fieldname": "qr_code_image",
+            "fieldtype": "HTML",
+            "label": "QR Image"
+        }
+    ],
+    "index_web_pages_for_search": 1,
+    "links": [
+        {
+            "group": "Messages",
+            "link_doctype": "Whatsapp Message",
+            "link_fieldname": "whatsapp_session"
+        }
+    ],
+    "modified": "2026-01-18 14:29:50.044158",
+    "modified_by": "Administrator",
+    "module": "Whatsapp",
+    "name": "Whatsapp Session",
+    "naming_rule": "By fieldname",
+    "owner": "Administrator",
+    "permissions": [
+        {
+            "create": 1,
+            "delete": 1,
+            "email": 1,
+            "export": 1,
+            "print": 1,
+            "read": 1,
+            "report": 1,
+            "role": "System Manager",
+            "share": 1,
+            "write": 1
+        }
+    ],
+    "row_format": "Dynamic",
+    "sort_field": "modified",
+    "sort_order": "DESC",
+    "states": [],
+    "track_changes": 1
+}
