@@ -103,3 +103,27 @@ class TestWhatsappMessage(FrappeTestCase):
         msg.reload()
         self.assertEqual(msg.status, "Failed")
         self.assertIn("API Error", msg.response)
+    @patch('whatsapp.whatsapp.services.waha.frappe.enqueue')
+    def test_retry_mechanism(self, mock_enqueue):
+        # Create a message (this will trigger enqueue once)
+        msg = frappe.get_doc({
+            "doctype": "Whatsapp Message",
+            "whatsapp_session": self.session.name,
+            "to_number": "1234567890",
+            "message": "Retry Me"
+        })
+        msg.insert()
+        
+        # Simulate failure
+        msg.status = "Failed"
+        msg.db_set("status", "Failed")
+        
+        # Reset mock to count retry calls
+        mock_enqueue.reset_mock()
+        
+        # Retry
+        msg.retry()
+        
+        # Check if enqueue was called
+        mock_enqueue.assert_called_once()
+        self.assertEqual(msg.status, "Queued")

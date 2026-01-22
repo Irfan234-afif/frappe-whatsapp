@@ -132,13 +132,16 @@ app_license = "mit"
 # ---------------
 # Hook on document methods and events
 
-# doc_events = {
-# 	"*": {
-# 		"on_update": "method",
-# 		"on_cancel": "method",
-# 		"on_trash": "method"
-# 	}
-# }
+doc_events = {
+	"*": {
+		"after_insert": "whatsapp.whatsapp.doctype.whatsapp_notification.whatsapp_notification.trigger_whatsapp_notifications",
+		"on_update": "whatsapp.whatsapp.doctype.whatsapp_notification.whatsapp_notification.trigger_whatsapp_notifications",
+		"on_submit": "whatsapp.whatsapp.doctype.whatsapp_notification.whatsapp_notification.trigger_whatsapp_notifications",
+		"on_cancel": "whatsapp.whatsapp.doctype.whatsapp_notification.whatsapp_notification.trigger_whatsapp_notifications",
+		"on_trash": "whatsapp.whatsapp.doctype.whatsapp_notification.whatsapp_notification.trigger_whatsapp_notifications",
+		"on_update_after_submit": "whatsapp.whatsapp.doctype.whatsapp_notification.whatsapp_notification.trigger_whatsapp_notifications",
+	}
+}
 
 # Scheduled Tasks
 # ---------------

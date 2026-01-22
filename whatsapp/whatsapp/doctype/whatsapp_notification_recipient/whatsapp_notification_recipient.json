@@ -1,0 +1,62 @@
+{
+    "actions": [],
+    "allow_rename": 1,
+    "creation": "2026-01-19 19:00:00.000000",
+    "doctype": "DocType",
+    "editable_grid": 1,
+    "engine": "InnoDB",
+    "field_order": [
+        "recruit_by",
+        "field_path",
+        "python_expression",
+        "fixed_number"
+    ],
+    "fields": [
+        {
+            "fieldname": "recruit_by",
+            "fieldtype": "Select",
+            "in_list_view": 1,
+            "label": "Recipient Type",
+            "options": "Field Path\nPython Expression\nFixed Number",
+            "reqd": 1,
+            "default": "Field Path"
+        },
+        {
+            "depends_on": "eval:doc.recruit_by=='Field Path'",
+            "fieldname": "field_path",
+            "fieldtype": "Data",
+            "in_list_view": 1,
+            "label": "Field Path",
+            "description": "Field path using dot notation (e.g., mobile_no, customer.mobile_no, contact_person.phone)"
+        },
+        {
+            "depends_on": "eval:doc.recruit_by=='Python Expression'",
+            "fieldname": "python_expression",
+            "fieldtype": "Code",
+            "in_list_view": 1,
+            "label": "Python Expression",
+            "options": "Python",
+            "description": "Python expression to get mobile number(s). Available context: doc, frappe. Should return a string or list of strings."
+        },
+        {
+            "depends_on": "eval:doc.recruit_by=='Fixed Number'",
+            "fieldname": "fixed_number",
+            "fieldtype": "Data",
+            "in_list_view": 1,
+            "label": "Fixed Number",
+            "description": "Fixed mobile number (e.g., +6281234567890)"
+        }
+    ],
+    "index_web_pages_for_search": 1,
+    "istable": 1,
+    "links": [],
+    "modified": "2026-01-19 19:00:00.000000",
+    "modified_by": "Administrator",
+    "module": "Whatsapp",
+    "name": "Whatsapp Notification Recipient",
+    "owner": "Administrator",
+    "permissions": [],
+    "sort_field": "creation",
+    "sort_order": "DESC",
+    "states": []
+}

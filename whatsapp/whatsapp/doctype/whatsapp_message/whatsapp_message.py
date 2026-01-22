@@ -4,6 +4,15 @@ import json
 
 class WhatsappMessage(Document):
     def after_insert(self):
+        self.send()
+
+    @frappe.whitelist()
+    def retry(self):
+        if self.status != "Failed":
+            frappe.throw("Only failed messages can be retried")
+        self.send()
+
+    def send(self):
         if not self.whatsapp_session:
             frappe.throw("Whatsapp Session is required to send message")
         

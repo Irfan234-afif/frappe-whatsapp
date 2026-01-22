@@ -1,25 +1,29 @@
 {
  "actions": [],
  "allow_rename": 1,
+ "autoname": "prompt",
  "creation": "2026-01-18 03:52:37.562368",
  "doctype": "DocType",
  "engine": "InnoDB",
  "field_order": [
-  "section_break_12ix"
+  "message"
  ],
  "fields": [
   {
-   "fieldname": "section_break_12ix",
-   "fieldtype": "Section Break"
+   "fieldname": "message",
+   "fieldtype": "Text Editor",
+   "in_list_view": 1,
+   "label": "Message"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2026-01-18 03:52:37.562368",
+ "modified": "2026-01-19 00:59:12.873797",
  "modified_by": "Administrator",
  "module": "Whatsapp",
  "name": "Whatsapp Template",
+ "naming_rule": "Set by user",
  "owner": "Administrator",
  "permissions": [
   {

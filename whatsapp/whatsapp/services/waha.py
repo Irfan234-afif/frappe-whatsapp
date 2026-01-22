@@ -210,7 +210,7 @@ def send_waha_message_job(session_name, to_number, message, message_id=None):
             else:
                 msg_doc.status = "Failed"
             
-            msg_doc.save()
+            msg_doc.save(ignore_permissions=True)
             frappe.db.commit()
             
     except Exception as e:
