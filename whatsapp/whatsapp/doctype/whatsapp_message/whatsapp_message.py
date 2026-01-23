@@ -12,6 +12,14 @@ class WhatsappMessage(Document):
             frappe.throw("Only failed messages can be retried")
         self.send()
 
+    def formatted_phone(self):
+        phone = self.to_number
+        phone = phone.replace("+", "")
+        phone = phone.replace(" ", "")
+        if phone.startswith("0"):
+            phone = "62" + phone[1:]
+        return phone
+
     def send(self):
         if not self.whatsapp_session:
             frappe.throw("Whatsapp Session is required to send message")
@@ -20,7 +28,7 @@ class WhatsappMessage(Document):
         provider = session_doc.get_provider_instance()
         
         # Pass message_id so backround job can update the document
-        response = provider.send_message(self.to_number, self.message, message_id=self.name)
+        response = provider.send_message(self.formatted_phone(), self.message, message_id=self.name)
         self.response = json.dumps(response, indent=4)
         
         # Check success based on provider response

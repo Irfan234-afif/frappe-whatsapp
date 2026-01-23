@@ -127,3 +127,21 @@ class TestWhatsappMessage(FrappeTestCase):
         # Check if enqueue was called
         mock_enqueue.assert_called_once()
         self.assertEqual(msg.status, "Queued")
+    
+    def test_formatted_phone_with_plus(self):
+        msg = frappe.get_doc({
+            "doctype": "Whatsapp Message",
+            "whatsapp_session": self.session.name,
+            "to_number": "+621234567890",
+            "message": "Test Msg"
+        })
+        self.assertEqual(msg.formatted_phone(), "621234567890")
+
+    def test_formatted_phone_with_0(self):
+        msg = frappe.get_doc({
+            "doctype": "Whatsapp Message",
+            "whatsapp_session": self.session.name,
+            "to_number": "081234567890",
+            "message": "Test Msg"
+        })
+        self.assertEqual(msg.formatted_phone(), "6281234567890")
