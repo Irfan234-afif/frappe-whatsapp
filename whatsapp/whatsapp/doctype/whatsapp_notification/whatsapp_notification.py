@@ -321,7 +321,7 @@ class WhatsappNotification(Document):
 		return bool(existing)
 
 	
-	def send_whatsapp_message(self, session: str, recipient: str, message: str, template, reference_id: str = None):
+	def send_whatsapp_message(self, session: str, recipient: str, message: str, template, reference_id: str = None, doc: Document = None):
 		"""
 		Send WhatsApp message using the session
 		
@@ -338,7 +338,9 @@ class WhatsappNotification(Document):
 			"whatsapp_session": session,
 			"to_number": recipient,
 			"message": message,
-			"reference_id": reference_id
+			"reference_id": reference_id,
+			"reference_doctype": doc.doctype if doc else None,
+			"reference_name": doc.name if doc else None,
 		})
 		whatsapp_message.insert(ignore_permissions=True)
 		frappe.db.commit()
