@@ -71,7 +71,7 @@ class WhatsappNotification(Document):
 		# Send to all recipients
 		for recipient in recipients:
 			try:
-				self.send_whatsapp_message(session, recipient, message, template, reference_id)
+				self.send_whatsapp_message(session, recipient, message, template, reference_id, doc)
 				frappe.logger().warning(f"WhatsApp sent to {recipient} for {doc.doctype} {doc.name}")
 			except Exception as e:
 				frappe.log_error(
@@ -340,7 +340,7 @@ class WhatsappNotification(Document):
 			"message": message,
 			"reference_id": reference_id,
 			"reference_doctype": doc.doctype if doc else None,
-			"reference_name": doc.name if doc else None,
+			"reference_docname": doc.name if doc else None,
 		})
 		whatsapp_message.insert(ignore_permissions=True)
 		frappe.db.commit()
