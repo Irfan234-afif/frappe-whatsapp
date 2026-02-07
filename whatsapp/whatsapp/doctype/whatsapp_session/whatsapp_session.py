@@ -75,6 +75,14 @@ class WhatsappSession(Document):
         self.save()
         return self.status
 
+    def validate(self):
+        if self.is_default_outgoing:
+            frappe.db.sql("""
+                UPDATE `tabWhatsapp Session`
+                SET is_default_outgoing = 0
+                WHERE name != %s
+            """, self.name)
+
     def on_trash(self):
         """Delete session from WAHA when document is deleted"""
         try:

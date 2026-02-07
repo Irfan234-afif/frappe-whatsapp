@@ -6,6 +6,9 @@ from frappe.model.document import Document
 from frappe.utils import get_link_to_form
 from typing import List, Union
 
+frappe.utils.logger.set_log_level("DEBUG")
+logger = frappe.logger("whatsapp", allow_site=True, file_count=3)
+
 
 class WhatsappNotification(Document):
 	def validate(self):
@@ -20,41 +23,41 @@ class WhatsappNotification(Document):
 		Args:
 			doc: The document that triggered the notification
 		"""
-		frappe.logger().warning(f"[WhatsApp Debug] send_notification called for {self.name}, doc: {doc.doctype} {doc.name}")
+		logger.warning(f"[WhatsApp Debug] send_notification called for {self.name}, doc: {doc.doctype} {doc.name}")
 		
 		# Check if notification is enabled
 		if not self.enabled:
-			frappe.logger().warning(f"[WhatsApp Debug] Notification {self.name} is disabled, skipping")
+			logger.warning(f"[WhatsApp Debug] Notification {self.name} is disabled, skipping")
 			return
 		
 		# Evaluate condition if specified
 		if self.condition:
-			frappe.logger().warning(f"[WhatsApp Debug] Evaluating condition for {self.name}: {self.condition}")
+			logger.warning(f"[WhatsApp Debug] Evaluating condition for {self.name}: {self.condition}")
 			if not self.evaluate_condition(doc):
-				frappe.logger().warning(f"[WhatsApp Debug] Condition NOT met for {self.name} on {doc.doctype} {doc.name}")
+				logger.warning(f"[WhatsApp Debug] Condition NOT met for {self.name} on {doc.doctype} {doc.name}")
 				return
-			frappe.logger().warning(f"[WhatsApp Debug] Condition MET for {self.name} on {doc.doctype} {doc.name}")
+			logger.warning(f"[WhatsApp Debug] Condition MET for {self.name} on {doc.doctype} {doc.name}")
 		
 		# Generate reference_id if template is provided
 		reference_id = None
 		if self.reference_id_template:
-			frappe.logger().warning(f"[WhatsApp Debug] Generating reference_id from template: {self.reference_id_template}")
+			logger.warning(f"[WhatsApp Debug] Generating reference_id from template: {self.reference_id_template}")
 			reference_id = self.generate_reference_id(doc)
-			frappe.logger().warning(f"[WhatsApp Debug] Generated reference_id: {reference_id}")
+			logger.warning(f"[WhatsApp Debug] Generated reference_id: {reference_id}")
 			
 			# Check for duplicate
 			if reference_id and self.check_duplicate_reference(reference_id):
-				frappe.logger().warning(f"[WhatsApp Debug] DUPLICATE found for reference_id: {reference_id}, skipping")
+				logger.warning(f"[WhatsApp Debug] DUPLICATE found for reference_id: {reference_id}, skipping")
 				return
 			else:
-				frappe.logger().warning(f"[WhatsApp Debug] No duplicate for reference_id: {reference_id}, proceeding")
+				logger.warning(f"[WhatsApp Debug] No duplicate for reference_id: {reference_id}, proceeding")
 		
 		# Get all recipients
-		frappe.logger().warning(f"[WhatsApp Debug] Getting recipients for {self.name}")
+		logger.warning(f"[WhatsApp Debug] Getting recipients for {self.name}")
 		recipients = self.get_recipients(doc)
-		frappe.logger().warning(f"[WhatsApp Debug] Found {len(recipients) if recipients else 0} recipients: {recipients}")
+		logger.warning(f"[WhatsApp Debug] Found {len(recipients) if recipients else 0} recipients: {recipients}")
 		if not recipients:
-			frappe.logger().warning(f"[WhatsApp Debug] NO RECIPIENTS found for {doc.doctype} {doc.name}, cannot send notification")
+			logger.warning(f"[WhatsApp Debug] NO RECIPIENTS found for {doc.doctype} {doc.name}, cannot send notification")
 			return
 		
 		# Get WhatsApp session
@@ -72,7 +75,7 @@ class WhatsappNotification(Document):
 		for recipient in recipients:
 			try:
 				self.send_whatsapp_message(session, recipient, message, template, reference_id, doc)
-				frappe.logger().warning(f"WhatsApp sent to {recipient} for {doc.doctype} {doc.name}")
+				logger.warning(f"WhatsApp sent to {recipient} for {doc.doctype} {doc.name}")
 			except Exception as e:
 				frappe.log_error(
 					title=f"WhatsApp Notification Failed: {self.name}",
@@ -93,20 +96,43 @@ class WhatsappNotification(Document):
 			# Log relevant field values for debugging
 			if "per_billed" in self.condition:
 				per_billed_value = getattr(doc, "per_billed", None)
-				frappe.logger().warning(f"[WhatsApp Debug] doc.per_billed = {per_billed_value} (type: {type(per_billed_value).__name__})")
+				logger.warning(f"[WhatsApp Debug] doc.per_billed = {per_billed_value} (type: {type(per_billed_value).__name__})")
 				
 				# Handle None value to prevent TypeError
 				if per_billed_value is None:
-					frappe.logger().warning(f"[WhatsApp Debug] per_billed is None, condition will fail")
+					logger.warning(f"[WhatsApp Debug] per_billed is None, condition will fail")
 					return False
 			
-			# Create safe evaluation context
+			# Import commonly used utils for conditions
+			from frappe.utils import (
+				now, nowdate, nowtime, today, getdate, get_datetime,
+				add_to_date, add_days, add_months, add_years,
+				date_diff, time_diff, cint, flt
+			)
+			
+			# Create safe evaluation context with utils available directly
 			context = {
 				"doc": doc,
 				"frappe": frappe,
+				# Date/time functions
+				"now": now,
+				"nowdate": nowdate,
+				"nowtime": nowtime,
+				"today": today,
+				"getdate": getdate,
+				"get_datetime": get_datetime,
+				"add_to_date": add_to_date,
+				"add_days": add_days,
+				"add_months": add_months,
+				"add_years": add_years,
+				"date_diff": date_diff,
+				"time_diff": time_diff,
+				# Type conversion
+				"cint": cint,
+				"flt": flt,
 			}
 			result = bool(frappe.safe_eval(self.condition, eval_locals=context))
-			frappe.logger().warning(f"[WhatsApp Debug] Condition '{self.condition}' evaluated to: {result}")
+			logger.warning(f"[WhatsApp Debug] Condition '{self.condition}' evaluated to: {result}")
 			return result
 		except Exception as e:
 			frappe.log_error(
@@ -364,7 +390,7 @@ def trigger_whatsapp_notifications(doc, method=None):
 		doc: The document that triggered the event
 		method: The event method (e.g., "on_submit", "on_update")
 	"""
-	frappe.logger().warning(f"[WhatsApp Debug] trigger_whatsapp_notifications called for {doc.doctype} {doc.name}, method: {method}")
+	logger.warning(f"[WhatsApp Debug] trigger_whatsapp_notifications called for {doc.doctype} {doc.name}, method: {method}")
 	
 	# Map method to event name
 	event_map = {
@@ -377,7 +403,7 @@ def trigger_whatsapp_notifications(doc, method=None):
 	}
 	
 	event = event_map.get(method, "Save")
-	frappe.logger().warning(f"[WhatsApp Debug] Looking for notifications with doctype={doc.doctype}, event={event}")
+	logger.warning(f"[WhatsApp Debug] Looking for notifications with doctype={doc.doctype}, event={event}")
 	
 	# Get all enabled notifications for this doctype and event
 	notifications = frappe.get_all(
@@ -390,17 +416,17 @@ def trigger_whatsapp_notifications(doc, method=None):
 		pluck="name"
 	)
 	
-	frappe.logger().warning(f"[WhatsApp Debug] Found {len(notifications)} notifications: {notifications}")
+	logger.warning(f"[WhatsApp Debug] Found {len(notifications)} notifications: {notifications}")
 	
 	# Trigger each notification
 	for notification_name in notifications:
 		try:
-			frappe.logger().warning(f"[WhatsApp Debug] Processing notification: {notification_name}")
+			logger.warning(f"[WhatsApp Debug] Processing notification: {notification_name}")
 			notification = frappe.get_doc("Whatsapp Notification", notification_name)
 			notification.send_notification(doc)
-			frappe.logger().warning(f"[WhatsApp Debug] Completed processing notification: {notification_name}")
+			logger.warning(f"[WhatsApp Debug] Completed processing notification: {notification_name}")
 		except Exception as e:
-			frappe.logger().error(f"[WhatsApp Debug] ERROR in notification {notification_name}: {str(e)}")
+			logger.error(f"[WhatsApp Debug] ERROR in notification {notification_name}: {str(e)}")
 			frappe.log_error(
 				title=f"WhatsApp Notification Error: {notification_name}",
 				message=f"Error sending notification: {str(e)}\nDocument: {get_link_to_form(doc.doctype, doc.name)}"

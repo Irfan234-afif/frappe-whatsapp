@@ -144,23 +144,14 @@ doc_events = {
 # Scheduled Tasks
 # ---------------
 
-# scheduler_events = {
-# 	"all": [
-# 		"whatsapp.tasks.all"
-# 	],
-# 	"daily": [
-# 		"whatsapp.tasks.daily"
-# 	],
-# 	"hourly": [
-# 		"whatsapp.tasks.hourly"
-# 	],
-# 	"weekly": [
-# 		"whatsapp.tasks.weekly"
-# 	],
-# 	"monthly": [
-# 		"whatsapp.tasks.monthly"
-# 	],
-# }
+scheduler_events = {
+	"cron": {
+		# Process scheduled WhatsApp notifications every 30 minutes
+		"*/30 * * * *": [
+			"whatsapp.whatsapp.tasks.process_scheduled_notifications"
+		]
+	}
+}
 
 # Testing
 # -------

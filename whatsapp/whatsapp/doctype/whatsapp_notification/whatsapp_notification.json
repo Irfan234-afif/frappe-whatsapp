@@ -12,6 +12,7 @@
         "section_break_5",
         "event",
         "value_changed",
+        "scheduled_filters",
         "condition",
         "reference_id_template",
         "section_break_template",
@@ -29,7 +30,7 @@
             "unique": 1
         },
         {
-            "default": "0",
+            "default": "1",
             "fieldname": "enabled",
             "fieldtype": "Check",
             "in_list_view": 1,
@@ -52,8 +53,9 @@
             "fieldtype": "Select",
             "in_list_view": 1,
             "label": "Event",
-            "options": "New\nSave\nSubmit\nCancel\nDelete\nUpdate After Submit\nValue Change",
-            "reqd": 1
+            "options": "New\nSave\nSubmit\nCancel\nDelete\nUpdate After Submit\nValue Change\nScheduled",
+            "reqd": 1,
+            "description": "'Scheduled' notifications are evaluated periodically by the scheduler against all matching documents"
         },
         {
             "depends_on": "eval:doc.event=='Value Change'",
@@ -61,6 +63,14 @@
             "fieldtype": "Data",
             "label": "Value Changed",
             "description": "Fieldname to check for value change"
+        },
+        {
+            "depends_on": "eval:doc.event=='Scheduled'",
+            "fieldname": "scheduled_filters",
+            "fieldtype": "Code",
+            "label": "Initial Filters",
+            "options": "JSON",
+            "description": "JSON object with Frappe filters to narrow down documents. Example: {\"status\": [\"in\", [\"To Bill\", \"To Deliver and Bill\"]], \"per_billed\": [\"<\", 100]}"
         },
         {
             "fieldname": "condition",
