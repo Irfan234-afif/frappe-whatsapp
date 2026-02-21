@@ -401,6 +401,9 @@ def trigger_whatsapp_notifications(doc, method=None):
 		"on_trash": "Delete",
 		"on_update_after_submit": "Update After Submit",
 	}
+
+	if frappe.flags.in_migrate or frappe.flags.in_install or frappe.flags.in_setup_wizard or frappe.flags.in_patch:
+		return
 	
 	event = event_map.get(method, "Save")
 	logger.warning(f"[WhatsApp Debug] Looking for notifications with doctype={doc.doctype}, event={event}")
